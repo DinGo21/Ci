@@ -1,0 +1,19 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-Werror",
+      "-Wextra",
+      "-Wall",
+      "-I",
+      "include/",
+      "-c",
+      "-o",
+      "obj/main.o",
+      "src/main.c"
+    ],
+    "directory": "/home/diegosantamaria/Projects/Ci",
+    "file": "/home/diegosantamaria/Projects/Ci/src/main.c",
+    "output": "/home/diegosantamaria/Projects/Ci/obj/main.o"
+  }
+]
