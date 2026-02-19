@@ -5,7 +5,7 @@
 #include "buffer.h"
 #include "utils/die.h"
 
-#define BUFFER_SIZE 80
+#define BUFFER_SIZE 500
 
 void	dbuff_init(dbuff_t *dbuff)
 {
@@ -23,19 +23,30 @@ void	dbuff_init(dbuff_t *dbuff)
 
 void	dbuff_resize(dbuff_t *dbuff, const unsigned int new_size)
 {
-	dbuff->buf = realloc(dbuff->buf, sizeof(*dbuff->buf) * (new_size + 1));
+	unsigned int	new_buf_size;
+
+	if (new_size > dbuff->buf_size)
+	{
+		if (new_size > dbuff->buf_size + BUFFER_SIZE)
+			new_buf_size = new_size;
+		else
+			new_buf_size = dbuff->buf_size + BUFFER_SIZE;
+	}
+	else
+		new_buf_size = new_size;
+	dbuff->buf = realloc(dbuff->buf, sizeof(*dbuff->buf) * (new_buf_size + 1));
 	if (dbuff->buf == NULL)
 	{
 		terminal_free();
 		dbuff_free(dbuff);
 		die("realloc");
 	}
-	if (new_size > dbuff->buf_size)
-		memset(dbuff->buf + dbuff->buf_size, 0, new_size - dbuff->buf_size);
-	dbuff->buf[new_size] = '\0';
+	if (new_buf_size > dbuff->buf_size)
+		memset(dbuff->buf + dbuff->buf_size, 0, new_buf_size - dbuff->buf_size);
+	dbuff->buf[new_buf_size] = '\0';
 	if (new_size < dbuff->size)
 		dbuff->size = new_size;
-	dbuff->buf_size = new_size;
+	dbuff->buf_size = new_buf_size;
 }
 
 void	dbuff_append(dbuff_t *dbuff, const char *ptr, const unsigned int n)

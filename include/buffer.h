@@ -9,7 +9,7 @@ typedef struct dbuff_s
 }	dbuff_t;
 
 void	dbuff_init(dbuff_t *dbuff);
-void	dbuff_resize(dbuff_t *dbuff, const unsigned int new_size);
+void	dbuff_resize(dbuff_t *dbuff, unsigned int new_size);
 void	dbuff_append(dbuff_t *dbuff, const char *ptr, const unsigned int n);
 void	dbuff_free(dbuff_t *dbuff);
 

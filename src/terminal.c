@@ -42,7 +42,7 @@ static int	terminal_get_window_size()
 	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 || ws.ws_col == 0)
 		return terminal_get_cursor_position();
 	t_config.wincols = ws.ws_col;
-	t_config.winrows = ws.ws_row;
+	t_config.winrows = ws.ws_row - 2;
 	return 0;
 }
 

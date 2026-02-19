@@ -4,7 +4,7 @@
 
 #include "key.h"
 #include "terminal.h"
-#include "screen.h"
+#include "window.h"
 #include "cursor.h"
 #include "utils/die.h"
 
@@ -87,7 +87,7 @@ void	key_process()
 	switch (key_read())
 	{
 		case QUIT:
-			screen_clear();
+			window_clear();
 			terminal_free();
 			exit(EXIT_SUCCESS);
 		case ESCAPE:

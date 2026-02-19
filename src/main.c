@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "key.h"
-#include "screen.h"
+#include "window.h"
 #include "terminal.h"
 #include "file.h"
 
@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 	atexit(terminal_rawmode_disable);
 	while (1)
 	{
-		screen_refresh();
+		window_refresh();
 		key_process();
 	}
 }
