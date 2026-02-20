@@ -6,6 +6,8 @@
 typedef enum keys_e
 {
 	QUIT = 1000,
+	BACKSPACE,
+	CARRIAGE,
 	ESCAPE,
 	UP,
 	DOWN,

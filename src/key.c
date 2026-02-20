@@ -77,8 +77,14 @@ keys_t	key_read(int *c)
 	}
 	if (*c == '\x1b')
 		return key_read_escape();
+	if (*c == CTRL_KEY('l'))
+		return ESCAPE;
 	if (*c == CTRL_KEY('q'))
 		return QUIT;
+	if (*c == 127 || *c == CTRL_KEY('h'))
+		return BACKSPACE;
+	if (*c == '\r')
+		return CARRIAGE;
 	return *c;
 }
 
@@ -88,12 +94,15 @@ void	key_process()
 
 	switch (key_read(&c))
 	{
+		case ESCAPE:
+		case BACKSPACE:
+		case CARRIAGE:
+		case DEL:
+			break;
 		case QUIT:
 			window_clear();
 			terminal_free();
 			exit(EXIT_SUCCESS);
-		case ESCAPE:
-			break;
 		case UP:
 			return (cursor_move_up(), cursor_move_eol());
 		case DOWN:
@@ -110,8 +119,6 @@ void	key_process()
 			return cursor_move_begin();
 		case END:
 			return cursor_move_end();
-		case DEL:
-			break;
 		default:
 			return key_insert(c);
 	}
