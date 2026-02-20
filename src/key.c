@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "key.h"
+#include "row.h"
 #include "terminal.h"
 #include "window.h"
 #include "cursor.h"
@@ -65,26 +66,27 @@ static keys_t	key_read_escape()
 	return key_check_arrow(seq[1]);
 }
 
-keys_t	key_read()
+keys_t	key_read(int *c)
 {
-	char	c;
 	int		nb;
 
-	while ((nb = read(STDIN_FILENO, &c, 1)) != 1)
+	while ((nb = read(STDIN_FILENO, c, 1)) != 1)
 	{
 		if (nb < 0 && errno != EAGAIN)
 			die("read");
 	}
-	if (c == '\x1b')
+	if (*c == '\x1b')
 		return key_read_escape();
-	if (c == CTRL_KEY('q'))
+	if (*c == CTRL_KEY('q'))
 		return QUIT;
-	return c;
+	return *c;
 }
 
 void	key_process()
 {
-	switch (key_read())
+	int	c;
+
+	switch (key_read(&c))
 	{
 		case QUIT:
 			window_clear();
@@ -110,6 +112,23 @@ void	key_process()
 			return cursor_move_end();
 		case DEL:
 			break;
+		default:
+			return key_insert(c);
 	}
+}
+
+void	key_insert(int c)
+{
+	row_t	*row;
+
+	if (t_config.cursor_y == t_config.nrows)
+	{
+		if ((row = row_create("", 0)) == NULL)
+			return (terminal_free(), die("row_create"));
+		row_list_append(&t_config.rows, row);
+		t_config.nrows++;
+	}
+	row_insert_char(row_search_by_index(t_config.rows, t_config.cursor_y),
+			t_config.cursor_x, c);
 }
 

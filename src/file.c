@@ -11,6 +11,7 @@ void	file_open(const char *file)
 {
 	FILE	*fd;
 	char	*line;
+	row_t	*row;
 	size_t	size;
 	int		nb;
 
@@ -19,10 +20,7 @@ void	file_open(const char *file)
 		die("fopen");
 	t_config.filename = strdup(file);
 	if (t_config.filename == NULL)
-	{
-		fclose(fd);
-		die("strdup");
-	}
+		return (fclose(fd), die("strdup"));
 	line = NULL;
 	size = 0;
 	while ((nb = getline(&line, &size, fd)) != 0)
@@ -31,10 +29,11 @@ void	file_open(const char *file)
 			break;
 		while (line[nb - 1] == '\r' || line[nb - 1] == '\n')
 			nb--;
-		row_list_append(&t_config.rows, row_create(line, nb));
+		if ((row = row_create(line, nb)) == NULL)
+			return (terminal_free(), die("row_create"));
+		row_list_append(&t_config.rows, row);
 		t_config.nrows++;
 	}
-	free(line);
-	fclose(fd);
+	return (fclose(fd), free(line));
 }
 

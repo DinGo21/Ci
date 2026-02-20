@@ -3,7 +3,7 @@
 
 #include "row.h"
 
-static int	row_render(row_t *row)
+static row_t	*row_render(row_t *row)
 {
 	int	tabs;
 	int	i;
@@ -15,9 +15,10 @@ static int	row_render(row_t *row)
 			tabs++;
 	}
 	row->render_size = i + tabs * (TAB_STOP - 1);
+	free(row->render);
 	row->render = malloc(sizeof(*row->render) * (row->render_size + 1));
 	if (row->render == NULL)
-		return -1;
+		return (row_delete(row), NULL);
 	row->render[row->render_size] = '\0';
 	i = 0;
 	for (int j = 0; j < row->raw_size; j++)
@@ -29,7 +30,7 @@ static int	row_render(row_t *row)
 		while (row->raw[j] == '\t' && i % TAB_STOP != 0)
 			row->render[i++] = ' ';
 	}
-	return 0;
+	return row;
 }
 
 row_t	*row_create(const char *str, const int size)
@@ -39,15 +40,18 @@ row_t	*row_create(const char *str, const int size)
 	row = malloc(sizeof(*row));
 	if (row == NULL)
 		return NULL;
-	row->raw = malloc(sizeof(*row->raw) * (size + 1));
+	row->raw_size = size;
+	row->raw = malloc(sizeof(*row->raw) * (row->raw_size + 1));
 	if (row->raw == NULL)
 		return (free(row), NULL);
-	strncpy(row->raw, str, size);
-	row->raw[size] = '\0';
-	row->raw_size = size;
-	if (row_render(row) < 0)
-		return (free(row->raw), free(row), NULL);
+	row->raw[row->raw_size] = '\0';
+	strncpy(row->raw, str, row->raw_size);
+	row->render_size = 0;
+	row->render = NULL;
 	row->next = NULL;
+	row = row_render(row);
+	if (row == NULL)
+		return NULL;
 	return row;
 }
 
@@ -56,6 +60,25 @@ void	row_delete(row_t *row)
 	free(row->raw);
 	free(row->render);
 	free(row);
+}
+
+row_t	*row_insert_char(row_t *row, int in, int c)
+{
+	char	*new_ptr;
+
+	if (in < 0 || in > row->raw_size)
+		in = row->raw_size;
+	new_ptr = realloc(row->raw, sizeof(*row->raw) * (++row->raw_size + 1));
+	if (new_ptr == NULL)
+		return (row_delete(row), NULL);
+	row->raw = new_ptr;
+	row->raw[row->raw_size] = '\0';
+	memmove(&row->raw[in + 1], &row->raw[in], row->raw_size - in);
+	row->raw[in] = c;
+	row = row_render(row);
+	if (row == NULL)
+		return NULL;
+	return row;
 }
 
 void	row_list_append(row_t **list, row_t *node)

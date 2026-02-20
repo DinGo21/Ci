@@ -10,7 +10,7 @@ void	cursor_move_up()
 
 void	cursor_move_down()
 {
-	if (t_config.cursor_y < t_config.nrows - 1)
+	if (t_config.cursor_y < t_config.nrows)
 		t_config.cursor_y++;
 }
 

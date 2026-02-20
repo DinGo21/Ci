@@ -23,6 +23,7 @@ void	dbuff_init(dbuff_t *dbuff)
 
 void	dbuff_resize(dbuff_t *dbuff, const unsigned int new_size)
 {
+	char			*new_ptr;
 	unsigned int	new_buf_size;
 
 	if (new_size > dbuff->buf_size)
@@ -34,13 +35,15 @@ void	dbuff_resize(dbuff_t *dbuff, const unsigned int new_size)
 	}
 	else
 		new_buf_size = new_size;
-	dbuff->buf = realloc(dbuff->buf, sizeof(*dbuff->buf) * (new_buf_size + 1));
-	if (dbuff->buf == NULL)
+
+	new_ptr = realloc(dbuff->buf, sizeof(*dbuff->buf) * (new_buf_size + 1));
+	if (new_ptr == NULL)
 	{
 		terminal_free();
 		dbuff_free(dbuff);
 		die("realloc");
 	}
+	dbuff->buf = new_ptr;
 	if (new_buf_size > dbuff->buf_size)
 		memset(dbuff->buf + dbuff->buf_size, 0, new_buf_size - dbuff->buf_size);
 	dbuff->buf[new_buf_size] = '\0';

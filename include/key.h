@@ -18,8 +18,9 @@ typedef enum keys_e
 	DEL
 }	keys_t;
 
-keys_t	key_read();
+keys_t	key_read(int *c);
 void	key_process();
+void	key_insert(int c);
 
 #endif
 
